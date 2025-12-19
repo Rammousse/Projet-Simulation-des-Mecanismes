@@ -73,10 +73,14 @@ class MoteurCC():
             self.u_m.append(self.u_m[-1])
     
     def plot(self):
-        from pylab import plot
+        from pylab import plot, xlabel, ylabel, grid
+        
         temps = [i * 0.01 for i in range(len(self.omega))]
         
-        return plot(temps,self.omega)    
+        plot(temps, self.omega, label=self.name, linewidth=2)
+        xlabel('Temps (s)')
+        ylabel('Vitesse (rad/s)')
+        grid(True)
 
 if __name__=='__main__':
     from pylab import figure, show, legend
@@ -97,4 +101,5 @@ if __name__=='__main__':
     
     figure()
     m.plot()
+    legend()
     show()
