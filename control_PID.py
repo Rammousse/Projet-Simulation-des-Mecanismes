@@ -62,7 +62,11 @@ if __name__ == '__main__':
     m_bo = MoteurCC(name="Boucle Ouverte", R = R, L= L, ke=ke, kc=kc, J=J, f=f)
     m_bf = MoteurCC(name="Boucle Fermée", R = R, L= L, ke=ke, kc=kc, J=J, f=f)
     
-    control = ControlPID_vitesse(m_bf, Kp=5.0, Ki=20.0, Kd=0.0)
+    P = 5.0
+    I = 20.0
+    D = 0.0
+    
+    control = ControlPID_vitesse(m_bf, Kp=P, Ki=I, Kd=D)
     
     # Calcul de la tension pour la boucle ouverte (1/K)
     # On veut que m_bo atteigne la même vitesse finale que la cible (1 rad/s)
