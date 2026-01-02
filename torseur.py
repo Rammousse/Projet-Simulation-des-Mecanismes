@@ -1,9 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Mar  7 14:24:05 2022
-
-@author: UserTP
-"""
 class Torseur():
     """Classe Torseur(P,R,M), [P]oint, [R]ésultante, [M]oment"""
 
