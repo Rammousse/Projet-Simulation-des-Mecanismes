@@ -142,6 +142,64 @@ class UniversCentrifuge(Univers):
         
         pygame.quit()
 
+def courbe_regime_permanent(k, l0, m_part):
+    """
+    Simule le système pour différentes vitesses de rotation et trace
+    la distance d'équilibre en fonction de omega.
+    """
+    
+    # Pour k=30, m=1, w_critique = sqrt(k/m) = sqrt(30) = 5.47 rad/s
+    vitesses = arange(0, 5.5, 0.25)
+    
+    distances_eq = []
+    omegas_eq = []
+    
+    step_simu = 0.005
+    
+    for v_target in vitesses:
+        univ_simu = Univers(step=step_simu, game=False)
+        
+        # Moteur et PID
+        motor_tmp = MoteurCC(J=0.1)
+        pid_tmp = ControlPID_vitesse(motor_tmp, Kp=20.0, Ki=50.0) # PID rapide
+        pid_tmp.setTarget(v_target)
+        
+        centre_tmp = Particule(p0=V3D(0,0,0), fix=True)
+        part_tmp = Particule(mass=m_part, p0=V3D(l0, 0, 0), v0=V3D(0,0,0))
+        
+        ressort_tmp = SpringDamper(centre_tmp, part_tmp, k=k, c=2.0, l0=l0) # Amortissement c=2
+        liaison_tmp = LiaisonMoteurPhysique(motor_tmp, pid_tmp, part_tmp, step=step_simu, pivot=centre_tmp)
+        
+        univ_simu.addParticule(part_tmp)
+        univ_simu.addGenerators(ressort_tmp, liaison_tmp)
+        
+        univ_simu.simulateFor(5.0)  # 5 secondes
+        
+        d_final = part_tmp.getPosition().mod()
+        w_final = motor_tmp.getSpeed()
+        
+        distances_eq.append(d_final)
+        omegas_eq.append(w_final)
+    
+    figure("Courbe d'équilibre Centrifuge")
+    plot(omegas_eq, distances_eq, 'bo-', label='Simulation Numérique')
+    
+    # théorique : k(d-l0) = m*w^2*d  =>  d = k*l0 / (k - m*w^2)
+    w_th = arange(0, 5.4, 0.01)
+    
+    # On évite la division par zéro ou les valeurs négatives proches de l'asymptote
+    w_th = [w for w in w_th if (k - m_part*w**2) > 0.1]
+    d_th = [(k*l0)/(k - m_part*w**2) for w in w_th]
+    
+    plot(w_th, d_th, 'r--', label='Théorie')
+    
+    title(f"Distance d'équilibre vs Vitesse rotation (k={k} N/m)")
+    xlabel("Vitesse de rotation (rad/s)")
+    ylabel("Distance à l'axe (m)")
+    grid(True)
+    legend()
+    show()
+
 
 if __name__ == '__main__':
     
@@ -149,6 +207,8 @@ if __name__ == '__main__':
     l0 = 0.5
     m_part = 1.0
     step = 0.005
+    
+    courbe_regime_permanent(k, l0, m_part)
     
     W_win, H_win = 1024, 780
     largeur_monde = 3.0 
