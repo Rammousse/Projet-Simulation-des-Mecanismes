@@ -211,7 +211,7 @@ if __name__ == '__main__':
     courbe_regime_permanent(k, l0, m_part)
     
     W_win, H_win = 1024, 780
-    largeur_monde = 3.0 
+    largeur_monde = 5.0 
     scale = W_win / largeur_monde 
     hauteur_monde = H_win / scale
     
