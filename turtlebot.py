@@ -1,6 +1,7 @@
 from vector3D import Vector3D as V3D
 from math import pi,atan2
 from random import random,randint
+from univers import Univers
 
 # un objet TurtleBot pour une simulation cinématique simple 
 class TurtleBot(object):
@@ -101,7 +102,7 @@ class TurtleBot(object):
         pygame.draw.line(screen,color,(X,Y),(X+VX,(Y+VY)),size)
 
 
-class Univers(object):
+class Univers_TurtleBot(object):
     def __init__(self,name='ici',t0=0,step=0.1,dimensions=(100,100),game=False,gameDimensions=(1024,780),fps=60):
         self.name=name
         self.time=[t0]
@@ -208,6 +209,7 @@ class Univers(object):
         
         pygame.quit()
 
+
 if __name__ == "__main__":    
     from pylab import figure, show, legend
     import pygame
@@ -265,7 +267,7 @@ if __name__ == "__main__":
     
     # Création de l'environnement de simulation
     
-    plage = Univers(name='plage',dimensions=(20,20))
+    plage = Univers_TurtleBot(name='plage',dimensions=(20,20))
 
     # On crée N robot aléatoires
     N = 5
