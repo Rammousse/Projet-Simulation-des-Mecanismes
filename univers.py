@@ -352,38 +352,33 @@ class LiaisonPivot(SpringDamper):
 
 
 class LiaisonGlissiere(Force):
-    """ 
-    On empêche la rotation (Ressort Torsion raide) et on empêcher le mouvement perpendiculaire à l'axe 
-    (Prism existant modifié ou ressort 2D).
-    
-    Ici, version simplifiée : On utilise un Prism existant (ressort d'axe) 
-    ET on ajoute un rappel d'angle pour garder l'orientation.
     """
-    def __init__(self, P0, P1, axis=V3D(1,0,0), k_trans=1000, c_trans=100, k_rot=5000, c_rot=100):
-        super().__init__(V3D(), "Glissiere", True)
-        self.P0 = P0
-        self.P1 = P1
-        self.axis = axis.norm() # Axe autorisé
-        self.k_t = k_trans
-        self.c_t = c_trans
-        self.k_r = k_rot
-        self.c_r = c_rot
-        
-        # On mémorise l'écart d'angle initial
-        theta0 = 0
-        if isinstance(P0, Barre2D) and isinstance(P1, Barre2D):
-            theta0 = P1.theta - P0.theta
-        self.delta_theta_ref = theta0
-
+    Maintient la particule sur un axe horizontal (y = constante).
+    """
+    def __init__(self, particule, y_fixe, k=4000, c=150):
+        super().__init__(name="Glissiere")
+        self.particule = particule
+        self.y_fixe = y_fixe
+        self.k = k
+        self.c = c
+    
     def setForce(self, p):
-        # On veut que la force de rappel ne s'applique QUE perpendiculairement à l'axe
+        if p != self.particule: return
         
-        # (Pour simplifier, on suppose ici que c'est une glissière parfaite où P1 glisse sur l'axe de P0)
-        # C'est complexe à implémenter génériquement en simple "Force".
-        # On va faire simple : Rappel vers l'axe + Rappel angulaire.
+        pos = p.getPosition()
+        vit = p.getSpeed()
         
-        pass # La glissière complète est complexe, on peut utiliser Prism + TorsionSpring
-            # Je propose d'utiliser les classes séparées dans le script de test pour montrer la construction.
+        # Rappel vers la ligne Y fixe pour le ressort vertical
+        dy = pos.y - self.y_fixe
+        vy = vit.y
+        fy = -self.k * dy - self.c * vy
+        
+        # Rappel vers Z=0 pour éviter que ça parte en profondeur
+        dz = pos.z
+        vz = vit.z
+        fz = -self.k * dz - self.c * vz
+        
+        p.applyForce(V3D(0, fy, fz))
 
 class Link(SpringDamper):
     def __init__(self,P0,P1,name="link"):
@@ -423,60 +418,3 @@ class Viscosity(Force):
         if self.active:
             viscosity = particule.getSpeed() * -self.coeff
             particule.applyForce(viscosity)
-
-if __name__=='__main__':
-    from pylab import figure, show, legend
-    
-    monUnivers = Univers(game=True, fps=60)
-    
-    monUnivers.step=0.001
-    
-    P0 = Particule(p0=V3D(10,10,0))
-    P_fixe = Particule(p0=V3D(monUnivers.dimensions[0]/2,monUnivers.dimensions[1]/2),fix=True, color='black')
-    P_osc = Particule(p0=V3D(monUnivers.dimensions[0]/2 - 10,monUnivers.dimensions[1]/2 - 10))
-    
-    force_gravity = Gravity(V3D(0,-10))
-    viscous = Viscosity(coeff=0)
-    
-    boing = Bounce_y(.9,monUnivers.step) 
-    boing2 = Bounce_x(1,monUnivers.step) 
-    
-    ressort = SpringDamper(P_fixe,P_osc,k=10,l0= 10 , c=1)
-    
-    monUnivers.addParticule(P_fixe, P_osc)
-    monUnivers.addParticule(P0)
-    
-    monUnivers.addGenerators(viscous, force_gravity)
-    monUnivers.addGenerators(boing,boing2,ressort)
-    
-    def myInteraction(self,events,keys):
-        # controle de leader avec le clavier
-        if keys[ord('z')] or keys[pygame.K_UP]: # And if the key is z or K_DOWN:
-            P_osc.applyForce(V3D(0,15))
-        if keys[ord('s')] or keys[pygame.K_DOWN]: # And if the key is s or K_DOWN:
-            P_osc.applyForce(V3D(0,-15))
-        if keys[ord('q')] or keys[pygame.K_LEFT]: # And if the key is q or K_DOWN:
-            P_osc.applyForce(V3D(-15,0))
-        if keys[ord('d')] or keys[pygame.K_RIGHT]: # And if the key is d K_DOWN:
-            P_osc.applyForce(V3D(15,0))
-        
-        if keys[pygame.K_SPACE]:
-            force_gravity.active = not force_gravity.active
-        
-        # Création des particules au clic de souris 
-        for event in events:
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                x , y = event.pos # les coordonnées en pixel, y vers le bas !
-                pos = V3D(x/self.scale,(monUnivers.gameDimensions[1]-y)/self.scale) # il faut mettre l'axe y vers le haut! 
-                vit = V3D(random()*20-10,random()*20-10)
-                name='P_'+str(len(monUnivers.population))
-                color=(random(),random(),random())
-                part = Particule(p0=pos,v0=vit,name=name,color=color,mass=1)
-                monUnivers.addParticule(part)
-
-# Surcharge de la fonction ici
-    monUnivers.gameInteraction = MethodType(myInteraction,monUnivers)
-    
-    monUnivers.simulateRealTime()
-    
-    monUnivers.plot()
