@@ -418,3 +418,32 @@ class Viscosity(Force):
         if self.active:
             viscosity = particule.getSpeed() * -self.coeff
             particule.applyForce(viscosity)
+
+class Pichenette(Effort):
+    """
+    Force temporaire qui s'applique pendant une durée définie puis se désactive.
+    """
+    def __init__(self, target, force_vector, duration=0.2, step=0.001):
+        # On initialise comme un Effort (Force ponctuelle sur une barre)
+        super().__init__(force=force_vector, subject=target, point_app=1, name="Pichenette")
+        
+        # Point=1 signifie le sommet du pendule
+        
+        self.duration = duration
+        self.step = step
+        self.elapsed = 0.0
+        
+    def setForce(self, p):
+        # Si la force n'est plus active, on ne fait rien
+        if not self.active:
+            return
+        
+        # On laisse la classe mère (Effort) appliquer la force physique
+        super().setForce(p)
+        
+        if p == self.subjects:
+            self.elapsed += self.step
+            
+            # Si le temps est écoulé, on désactive la force
+            if self.elapsed >= self.duration:
+                self.active = False
