@@ -7,7 +7,7 @@ from univers import Univers, Gravity, LiaisonPivot, LiaisonMotorisee
 from particule import Particule
 from barre2D import Barre2D
 from moteurCC import MoteurCC
-from control_PID_Robot import ControlPIDRobot1R
+from control_PID_Robot import ControlPIDRobot
 
 
 def demo_robot_1R():
@@ -32,7 +32,7 @@ def demo_robot_1R():
     
     # Moteur et PID 
     moteur = MoteurCC(R=2.0, ke=0.5, kc=0.5, name="Moteur Axe 1") 
-    pid = ControlPIDRobot1R(Kp=30.0, Ki=1.0, Kd=2.5, output_limit=12.0)
+    pid = ControlPIDRobot(Kp=30.0, Ki=1.0, Kd=2.5, output_limit=12.0)
     
     # liaison avec bodyA = pivot, bodyB = bras. 
     liaison_mot = LiaisonMotorisee(pivot, bras, moteur, pid, dt, anchorA=0, anchorB=-1)
