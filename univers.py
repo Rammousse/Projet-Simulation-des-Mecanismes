@@ -5,6 +5,7 @@ import pygame
 from pygame.locals import *
 from types import MethodType
 from barre2D import Barre2D
+from math import cos, sin, atan2
 
 class Univers(object):
     def __init__(self,name='ici',t0=0,step=0.1,dimensions=(100,100),game=False,gameDimensions=(1024,780),fps=60):
@@ -447,3 +448,69 @@ class Pichenette(Effort):
             # Si le temps est écoulé, on désactive la force
             if self.elapsed >= self.duration:
                 self.active = False
+
+
+class LiaisonMotorisee(Force):
+    def __init__(self, bodyA, bodyB, motor, pid, dt, anchorA=0, anchorB=0):
+        super().__init__(name=f"Joint_{motor.name}")
+        self.bodyA = bodyA 
+        self.bodyB = bodyB 
+        self.motor = motor
+        self.pid = pid
+        self.dt = dt
+        self.voltage = 0.0
+        self.anchorA = anchorA
+        self.anchorB = anchorB
+    
+    def setForce(self, p):
+        # On applique les forces uniquement lors du traitement du corps B (le bras)
+        # pour éviter de doubler les calculs ou l'intégration du PID.
+        if p != self.bodyB: 
+            return
+        
+        # Récupération de l'état cinématique (angles et vitesses)
+        # Si le corps A est une barre, on récupère ses valeurs, sinon on considère qu'il est fixe (0)
+        if isinstance(self.bodyA, Barre2D):
+            theta_A = self.bodyA.theta
+            omega_A = self.bodyA.omega
+        else:
+            theta_A = 0
+            omega_A = 0
+        
+        theta_B = self.bodyB.theta
+        omega_B = self.bodyB.omega
+        
+        relative_theta = theta_B - theta_A
+        relative_omega = omega_B - omega_A
+        
+        # Calcul de la tension de commande via le PID
+        pid_voltage = self.pid.compute(relative_theta, self.dt)
+        
+        # Compensation de gravité (Feed-Forward)
+        m = self.bodyB.mass
+        L = self.bodyB.length 
+        g = 9.81
+        
+        # Estimation du couple nécessaire pour compenser le poids du bras
+        C_gravity = m * g * (L/2.0) * cos(theta_B)
+        
+        # Conversion du couple de gravité en tension équivalente pour aider le moteur
+        u_gravity = (self.motor.R * C_gravity) / self.motor.kc
+        
+        # Calcul de la tension totale avec saturation (limites de l'alimentation)
+        self.voltage = pid_voltage + u_gravity
+        self.voltage = max(-12.0, min(12.0, self.voltage))
+        
+        # Modèle électrique du moteur (U = E + RI)
+        E = self.motor.ke * relative_omega
+        I = (self.voltage - E) / self.motor.R
+        Gamma = self.motor.kc * I
+        
+        TorqueVec = V3D(0, 0, Gamma)
+        
+        # Action moteur sur le bras
+        self.bodyB.applyEffort(Torque=TorqueVec, Point=self.anchorB)
+            
+        # Réaction sur le support (uniquement si c'est un objet mobile comme une barre)
+        if isinstance(self.bodyA, Barre2D):
+            self.bodyA.applyEffort(Torque=-TorqueVec, Point=self.anchorA)
