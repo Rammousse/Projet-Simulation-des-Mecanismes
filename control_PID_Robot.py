@@ -1,6 +1,6 @@
 from math import pi
 
-class ControlPIDRobot1R:
+class ControlPIDRobot:
     """ PID avec Anti-Windup et gestion du passage à PI """
     def __init__(self, Kp, Ki, Kd, output_limit=12.0):
         self.Kp, self.Ki, self.Kd = Kp, Ki, Kd
