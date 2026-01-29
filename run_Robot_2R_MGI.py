@@ -9,7 +9,7 @@ from barre2D import Barre2D
 from moteurCC import MoteurCC
 from control_PID_Robot import ControlPIDRobot
 
-def solve_MGI(target_pos, origin_pos, L1, L2):
+def MGI(target_pos, origin_pos, L1, L2):
     """
     Calcule le Modèle Géométrique Inverse pour un robot 2R.
     Retourne une liste de tuples [(theta1_a, theta2_a), (theta1_b, theta2_b)].
@@ -59,7 +59,7 @@ def solve_MGI(target_pos, origin_pos, L1, L2):
         
     return solutions
 
-def get_best_solution(solutions, current_th1, current_th2):
+def best_solution(solutions, current_th1, current_th2):
     """
     Choisit la solution la plus proche de la configuration actuelle.
     """
@@ -153,7 +153,7 @@ def demo_robot_2R_MGI():
             cible_visuelle.position[-1] = target_coords
             
             # calcul des solutions inverses
-            solutions = solve_MGI(target_coords, pivot_pos, L1, L2)
+            solutions = MGI(target_coords, pivot_pos, L1, L2)
             
             if solutions:
                 # récupération des angles actuel
@@ -161,7 +161,7 @@ def demo_robot_2R_MGI():
                 current_th2 = bras2.theta - bras1.theta
                 
                 # sélection de la solution la plus proche
-                best = get_best_solution(solutions, current_th1, current_th2)
+                best = best_solution(solutions, current_th1, current_th2)
                 
                 if best:
                     th1_cmd, th2_cmd = best
