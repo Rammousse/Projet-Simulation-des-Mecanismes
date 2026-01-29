@@ -143,11 +143,9 @@ def demo_robot_2R_MCI():
         
         if dist_error > dist_threshold:
             direction = diff_vec.norm()
-            if dist_error < braking_distance:
-                speed_factor = dist_error / braking_distance
-                current_speed = max(0.1, V_max * speed_factor)
-            else:
-                current_speed = V_max
+            
+            # vitesse max comme constante
+            current_speed = V_max
             
             v_cmd = direction * current_speed
             dX[0, 0] = v_cmd.x
