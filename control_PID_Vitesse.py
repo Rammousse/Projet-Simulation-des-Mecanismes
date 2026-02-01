@@ -85,7 +85,7 @@ if __name__ == '__main__':
     steps = 0.01
     temps = [t]
     
-    while t < 2.0:
+    while t < 5.0:
         t += steps
         temps.append(t)
         
