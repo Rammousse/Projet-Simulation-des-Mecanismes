@@ -5,7 +5,7 @@ from vector3D import Vector3D as V3D
 from univers import Univers
 from turtlebot import TurtleBot
 from moteurCC import MoteurCC
-from control_PID import ControlPID_vitesse
+from control_PID_Vitesse import ControlPID_vitesse
 
 class TurtleBotMotorise(TurtleBot):
     """
