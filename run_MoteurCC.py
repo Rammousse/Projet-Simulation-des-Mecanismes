@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 def simulateAll(Kp, Ki, Kd, duration=5.0, target=10.0):
     # création d'un nouveau moteur (pour partir de 0 à chaque fois)
     motor = MoteurCC(name=f"PID(P={Kp}, I={Ki})", 
-                     R=1.0, L=0.001, ke=0.01, kc=0.01, J=0.01, f=0.1)
+                    R=1.0, L=0.001, ke=0.01, kc=0.01, J=0.01, f=0.1)
     
     # création du contrôleur
     pid = ControlPID_vitesse(motor, Kp=Kp, Ki=Ki, Kd=Kd)
