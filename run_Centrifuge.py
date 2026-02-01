@@ -5,7 +5,7 @@ from vector3D import Vector3D as V3D
 from particule import Particule
 from univers import Univers, Force, SpringDamper
 from moteurCC import MoteurCC
-from control_PID import ControlPID_vitesse
+from control_PID_Vitesse import ControlPID_vitesse
 
 class LiaisonMoteurPhysique(Force):
     """
