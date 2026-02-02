@@ -17,19 +17,19 @@ class ControlPID_vitesse(object):
         
         self.target_history = [0.0] 
         self.voltage_history = [0.0]
-
+    
     def __str__(self):
         return f"PID Controler (Kp={self.Kp}, Ki={self.Ki}, Kd={self.Kd}) on {self.motor.name}"
-
+    
     def __repr__(self):
         return str(self)
-
+    
     def setTarget(self, speed):
         self.target = speed
-
+    
     def getVoltage(self):
         return self.last_voltage
-
+    
     def simule(self, step):
         current_speed = self.motor.getSpeed()
         error = self.target - current_speed
@@ -62,8 +62,8 @@ if __name__ == '__main__':
     m_bo = MoteurCC(name="Boucle Ouverte", R = R, L= L, ke=ke, kc=kc, J=J, f=f)
     m_bf = MoteurCC(name="Boucle Fermée", R = R, L= L, ke=ke, kc=kc, J=J, f=f)
     
-    P = 5.0
-    I = 20.0
+    P = 20.0
+    I = 60.0
     D = 0.0
     
     control = ControlPID_vitesse(m_bf, Kp=P, Ki=I, Kd=D)
@@ -78,14 +78,14 @@ if __name__ == '__main__':
     inverse_gain_static = denom / kc
     voltage_bo = target_speed * inverse_gain_static
     
-    print(f"Gain statique inverse calculé : {inverse_gain_static:.4f}")
+    print(f"\nGain statique inverse calculé : {inverse_gain_static:.4f}")
     print(f"Tension appliquée en BO pour atteindre {target_speed} rad/s : {voltage_bo:.2f} V")
     
     t = 0
     steps = 0.01
     temps = [t]
     
-    while t < 5.0:
+    while t < 3.0:
         t += steps
         temps.append(t)
         
@@ -95,6 +95,11 @@ if __name__ == '__main__':
         control.simule(steps)
         
         m_bo.simule(steps)
+    
+    # On cherche la valeur absolue maximale dans l'historique des tensions
+    u_max = max([abs(u) for u in control.voltage_history])
+    print(f"\nPour Kp={P} et Ki={I} :")
+    print(f"Tension MAX demandée par le PID = {u_max:.2f} V\n")
     
     figure("Comparaison BO vs BF")
     m_bo.plot()
