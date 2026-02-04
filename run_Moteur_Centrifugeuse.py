@@ -105,7 +105,7 @@ def courbe_regime_permanent(k, l0, m_part):
     """
     
     # Pour k=30, m=1, w_critique = sqrt(k/m) = sqrt(30) = 5.47 rad/s
-    vitesses = arange(0, 5.5, 0.25)
+    vitesses = arange(0, 5.3, 0.25)
     
     distances_eq = []
     omegas_eq = []
@@ -116,20 +116,20 @@ def courbe_regime_permanent(k, l0, m_part):
         univ_simu = Univers(step=step_simu, game=False)
         
         # Moteur et PID
-        motor_tmp = MoteurCC(J=0.1)
-        pid_tmp = ControlPID_vitesse(motor_tmp, Kp=20.0, Ki=50.0) # PID rapide
+        motor_tmp = MoteurCC(J=0.1, f=0.01, name="SimuTurbo") # on change f à 10x moins qu'avant
+        pid_tmp = ControlPID_vitesse(motor_tmp, Kp=20.0, Ki=60.0)
         pid_tmp.setTarget(v_target)
         
         centre_tmp = Particule(p0=V3D(0,0,0), fix=True)
         part_tmp = Particule(mass=m_part, p0=V3D(l0, 0, 0), v0=V3D(0,0,0))
         
-        ressort_tmp = SpringDamper(centre_tmp, part_tmp, k=k, c=2.0, l0=l0) # Amortissement c=2
+        ressort_tmp = SpringDamper(centre_tmp, part_tmp, k=k, c=10.0, l0=l0) # Amortissement c=10
         liaison_tmp = LiaisonMoteurPhysique(motor_tmp, pid_tmp, part_tmp, step=step_simu, pivot=centre_tmp)
         
         univ_simu.addParticule(part_tmp)
         univ_simu.addGenerators(ressort_tmp, liaison_tmp)
         
-        univ_simu.simulateFor(5.0)  # 5 secondes
+        univ_simu.simulateFor(20.0)  # 20 secondes
         
         d_final = part_tmp.getPosition().mod()
         w_final = motor_tmp.getSpeed()
@@ -173,7 +173,8 @@ if __name__ == '__main__':
     
     OFFSET = V3D(largeur_monde / 2, hauteur_monde / 2, 0)
     
-    motor = MoteurCC(name="Moteur Z", J=0.1)
+    # on met des frottements plus faibles pour voir la fréquence crituqeu
+    motor = MoteurCC(name="Moteur Z", J=0.1, f=0.01)
     pid = ControlPID_vitesse(motor, Kp=20.0, Ki=60.0)
     pid.setTarget(2.0)
     
