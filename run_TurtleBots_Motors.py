@@ -19,7 +19,7 @@ class TurtleBotMotorise(TurtleBot):
         self.wheelbase = wheelbase  # Entraxe roues (m)
         
         # 2 moteurs identiques pour la gauche et la droite
-        params_moteur = {'R':1.0, 'L':0.001, 'ke':0.01, 'kc':0.01, 'J':0.01, 'f':0.1}
+        params_moteur = {'R':1.0, 'L':0.001, 'ke':0.01, 'kc':0.01, 'J':0.01, 'f':0.01}
         
         self.motorL = MoteurCC(name="MotGauche", **params_moteur)
         self.motorR = MoteurCC(name="MotDroit",  **params_moteur)
