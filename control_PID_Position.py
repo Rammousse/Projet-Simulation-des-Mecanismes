@@ -72,7 +72,7 @@ if __name__ == '__main__':
     # Cas 3 : Kp fort (rapidité) + Kd (amortissement/freinage à l'approche).
     pid3 = ControlPID_Position(m3, Kp=10.0, Ki=0.0, Kd=1.0)
     
-    target_pos = 10.0
+    target_pos = 1.0
     
     pid1.setTarget(target_pos)
     pid2.setTarget(target_pos)
@@ -82,7 +82,7 @@ if __name__ == '__main__':
     steps = 0.01
     temps = [t]
     
-    while t < 4.0:
+    while t < 5.0:
         t += steps
         temps.append(t)
         
