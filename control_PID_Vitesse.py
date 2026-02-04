@@ -3,11 +3,13 @@ from pylab import *
 
 class ControlPID_vitesse(object):
     
-    def __init__(self, motor, Kp=1.0, Ki=0.0, Kd=0.0):
+    def __init__(self, motor, Kp=1.0, Ki=0.0, Kd=0.0, Vmax=24.0):
         self.motor = motor
         self.Kp = Kp
         self.Ki = Ki
         self.Kd = Kd
+        
+        self.Vmax = Vmax
         
         self.target = 0.0
         
@@ -37,9 +39,32 @@ class ControlPID_vitesse(object):
         self.integral_error += error * step
         derivative_error = (error - self.previous_error) / step
         
-        # Calcul de la commande (Tension)
-        # U = Kp*e + Ki*int(e) + Kd*de/dt
-        voltage = (self.Kp * error) + (self.Ki * self.integral_error) + (self.Kd * derivative_error)
+        integ = self.integral_error + error * step
+        
+        derivative_error = (error - self.previous_error) / step
+        
+        # commande brute théorique
+        tension = (self.Kp * error) + (self.Ki * integ) + (self.Kd * derivative_error)
+        
+        # Saturation et Anti-Windup
+        if tension > self.Vmax:
+            voltage = self.Vmax
+            # si l'erreur essaie encore d'augmenter la tension on refuse l'intégration
+            if error > 0:
+                self.integral_error = self.integral_error 
+            else:
+                self.integral_error = integ
+                
+        elif tension < -self.Vmax:
+            voltage = -self.Vmax
+            if error < 0:
+                self.integral_error = self.integral_error 
+            else:
+                self.integral_error = integ
+        else:
+            # pas de saturation
+            voltage = tension
+            self.integral_error = integ
         
         self.last_voltage = voltage
         self.previous_error = error
@@ -72,7 +97,7 @@ if __name__ == '__main__':
     # On veut que m_bo atteigne la même vitesse finale que la cible (1 rad/s)
     # Vitesse_inf = (U * kc) / (R*f + kc*ke)
     # Donc U_necessaire = Vitesse_cible * (R*f + kc*ke) / kc
-    target_speed = 10.0 # rad/s
+    target_speed = 1.0 # rad/s
     
     denom = (R * f) + (kc * ke)
     inverse_gain_static = denom / kc

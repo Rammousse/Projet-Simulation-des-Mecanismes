@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 class MoteurCC():
     
-    def __init__(self, R=1.0, L=0.001, ke=0.01, kc=0.01, J=0.01, f=0.1, name="Motor1"):
+    def __init__(self, R=1.0, L=0.001, ke=0.01, kc=0.01, J=0.01, f=0.1, Vmax=24.0, name="Motor1"):
         
         self.R = R              # Résistance (Ohms)
         self.L = L              # Inductance (Henry)
@@ -22,6 +22,7 @@ class MoteurCC():
         self.gamma = [0.0]      # Couple moteur (N.m)
         self.position = [0.0]   # Position angulaire (rad)
         
+        self.Vmax = Vmax        # Saturation de la tension (V)
     
     def __str__(self):
         return f"MoteurCC: {self.name} (R={self.R}, ke={self.ke}, J={self.J})"
@@ -42,7 +43,14 @@ class MoteurCC():
         return self.i[-1]
     
     def setVoltage(self, U):
-        self.u_m.append(U)
+        if U > self.Vmax:
+            U_eff = self.Vmax
+        elif U < -self.Vmax:
+            U_eff = -self.Vmax
+        else:
+            U_eff = U
+            
+        self.u_m.append(U_eff)
     
     def simule(self, step):
         omega_old = self.omega[-1]

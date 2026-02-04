@@ -25,7 +25,7 @@ def simulateAll(Kp, Ki, Kd, duration=5.0, target=10.0):
     return times, speeds
 
 if __name__ == '__main__':
-    target_speed = 10.0 # Consigne (rad/s)
+    target_speed = 1.0 # Consigne (rad/s)
     
     # Influence du Gain Proportionnel (P)
     gains_P = [0.5, 2.0, 10.0, 20.0, 150.0]
