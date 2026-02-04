@@ -239,6 +239,52 @@ class BoxBoundaries(Force):
         elif pos.y > self.y_max:
              p.applyForce(V3D(0, self.k * (self.y_max - pos.y) - self.damping * vit.y, 0))
 
+
+class LiaisonMoteurPhysique(Force):
+    """
+    Gère la contrainte cinématique et la mise à jour du moteur.
+    Prend en compte un point de Pivot pour le centre de rotation.
+    """
+    def __init__(self, moteur, pid, particule, step, pivot=None):
+        super().__init__(name="Glissière Moteur")
+        self.moteur = moteur
+        self.pid = pid
+        self.particule = particule
+        self.step = step
+        self.pivot = pivot
+    
+    def setForce(self, p):
+        if p == self.particule:
+            
+            self.pid.simule(self.step)
+            
+            # centre de rotation
+            if self.pivot:
+                center_pos = self.pivot.getPosition()
+            else:
+                center_pos = V3D(0,0,0)
+            
+            pos_rel = self.particule.getPosition() - center_pos
+            r = pos_rel.mod() 
+            
+            theta_moteur = self.moteur.getPosition()
+            omega_moteur = self.moteur.getSpeed()
+            vit = self.particule.getSpeed()
+            
+            if r > 0:
+                v_radiale = (vit ** pos_rel) / r 
+            else:
+                v_radiale = 0
+            
+            new_rel_x = r * cos(theta_moteur)
+            new_rel_y = r * sin(theta_moteur)
+            
+            v_x = v_radiale * cos(theta_moteur) - (r * omega_moteur) * sin(theta_moteur)
+            v_y = v_radiale * sin(theta_moteur) + (r * omega_moteur) * cos(theta_moteur)
+            
+            self.particule.position[-1] = center_pos + V3D(new_rel_x, new_rel_y, 0)
+            self.particule.speed[-1]    = V3D(v_x, v_y, 0)
+
 class SpringDamper(Force):
     """ Version modifiée pour gérer les points d'ancrage sur Barre2D """
     def __init__(self, P0, P1, k=0, c=0, l0=0, active=True, name="spring", 
