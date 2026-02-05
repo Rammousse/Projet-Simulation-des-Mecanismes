@@ -22,6 +22,18 @@ def simulateAll(Kp, Ki, Kd, duration=5.0, target=10.0):
         pid.simule(step)      # Calcule la commande et l'applique
         speeds.append(motor.getSpeed())
         
+    # On cherche la valeur maximale atteinte
+    tension_max = 0
+    for u in pid.voltage_history:
+        if abs(u) > tension_max:
+            tension_max = abs(u)
+            
+    # On compare avec la limite du PID
+    if tension_max >= (pid.Vmax - 0.01):
+        print(f" Config Kp={Kp:5.1f}, Ki={Ki:5.1f} : SATURATION (Max: {tension_max:.2f} V)")
+    else:
+        print(f" Config Kp={Kp:5.1f}, Ki={Ki:5.1f} : OK         (Max: {tension_max:.2f} V)")
+    
     return times, speeds
 
 if __name__ == '__main__':
@@ -43,7 +55,7 @@ if __name__ == '__main__':
     plt.legend()
     
     # Influence du Gain Intégral (I)
-    fixed_P = 2.0
+    fixed_P = 20.0
     gains_I = [0.0, 5.0, 15.0, 30.0, 60.0]
     
     plt.figure(figsize=(10, 6))
