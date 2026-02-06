@@ -12,7 +12,7 @@ PID_KP = 100.0
 PID_KI = 60.0  
 PID_KD = 20.0   
 
-KP_GUIDAGE = 2.0  
+KP_GUIDAGE = 1.0  
 V_MAX = 1.0       
 
 DT = 0.01
