@@ -2,7 +2,7 @@ from math import pi
 
 class ControlPIDRobot:
     """ PID avec Anti-Windup et gestion du passage à PI """
-    def __init__(self, Kp, Ki, Kd, output_limit=12.0):
+    def __init__(self, Kp, Ki, Kd, output_limit=24.0):
         self.Kp, self.Ki, self.Kd = Kp, Ki, Kd
         self.target = 0
         self.integral = 0
