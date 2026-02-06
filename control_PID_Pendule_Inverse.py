@@ -4,17 +4,17 @@ class ControlPID_Pendule():
     """
     Contrôleur par retour d'état pour le Pendule Inversé.
     """
-    def __init__(self, x_target=10.0, theta_target=math.pi/2):
+    def __init__(self, x_target=10.0, theta_target=math.pi/2, Kp_theta= 4000.0, Kd_theta = 600.0, Kp_x = 30.0, Kd_x = 60.0):
         self.x_target = x_target
         self.theta_target = theta_target
         
         # Gains pour l'angle
-        self.Kp_theta = 4000.0  # Raideur angulaire (Réaction proportionnelle à l'erreur d'angle)
-        self.Kd_theta = 600.0   # Amortissement angulaire (Freine la rotation)
+        self.Kp_theta = Kp_theta  # Raideur angulaire (Réaction proportionnelle à l'erreur d'angle)
+        self.Kd_theta = Kd_theta  # Amortissement angulaire (Freine la rotation)
         
         # Gains pour la position (revenir au centre)
-        self.Kp_x = 30.0        # Rappel vers la position x_target
-        self.Kd_x = 60.0        # Amortissement du chariot (Freine la vitesse linéaire)
+        self.Kp_x = Kp_x        # Rappel vers la position x_target
+        self.Kd_x = Kd_x        # Amortissement du chariot (Freine la vitesse linéaire)
         
     def compute(self, theta, omega, x, v):
         """
