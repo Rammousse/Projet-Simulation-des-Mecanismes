@@ -118,7 +118,7 @@ def demo_robot_2R_MGI():
     
     # Moteur 2 (Coude)
     moteur2 = MoteurCC(R=1.0, ke=1.0, kc=1.0, name="Moteur 2")
-    pid2 = ControlPIDRobot(Kp=600.0, Ki=0.1, Kd=100.0, output_limit=12.0)
+    pid2 = ControlPIDRobot(Kp=600.0, Ki=0.1, Kd=100.0, output_limit=24.0)
     joint2 = LiaisonMotorisee(bras1, bras2, moteur2, pid2, dt, anchorA=1, anchorB=-1)
     
     # Initialisation des consignes

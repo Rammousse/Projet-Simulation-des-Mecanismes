@@ -73,7 +73,7 @@ def demo_robot_2R_MCI():
     joint1 = LiaisonMotorisee(socle, bras1, moteur1, pid1, dt, anchorA=0, anchorB=-1)
     
     moteur2 = MoteurCC(R=1.0, ke=1.0, kc=1.0, name="Moteur 2")
-    pid2 = ControlPIDRobot(Kp=800.0, Ki=2.0, Kd=80.0, output_limit=12.0)
+    pid2 = ControlPIDRobot(Kp=800.0, Ki=2.0, Kd=80.0, output_limit=24.0)
     joint2 = LiaisonMotorisee(bras1, bras2, moteur2, pid2, dt, anchorA=1, anchorB=-1)
     
     pid1.target = init_q1
@@ -89,8 +89,7 @@ def demo_robot_2R_MCI():
     start_cartesian = V3D(target_cartesian.x, target_cartesian.y)
     
     V_max = 6.0           
-    dist_threshold = 0.001 
-    braking_distance = 0.2 
+    dist_threshold = 0.001
     
     history = {'t': [], 'dist_err': [], 'lateral_err': [], 'q1': [], 'q2': []}
     

@@ -37,7 +37,7 @@ def demo_robot_2R():
     
     # Motorisation
     moteur1 = MoteurCC(R=0.2, ke=2.0, kc=2.0, name="Moteur 1")
-    pid1 = ControlPIDRobot(Kp=800.0, Ki=5.0, Kd=60.0, output_limit=12.0)
+    pid1 = ControlPIDRobot(Kp=800.0, Ki=5.0, Kd=60.0, output_limit=24.0)
     joint1 = LiaisonMotorisee(socle, bras1, moteur1, pid1, dt, anchorA=0, anchorB=-1)
     
     moteur2 = MoteurCC(R=1.0, ke=1.0, kc=1.0, name="Moteur 2")
