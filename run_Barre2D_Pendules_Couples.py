@@ -46,8 +46,16 @@ def demo_pendules_couples():
     Ecart = 10.0
     X_pivot2 = X_pivot1 + Ecart
     
-    # Initialisation
-    theta1, theta2 = 0.0, 0.0
+    # Choix du mode pour la démonstration :
+    # 0: Repos (pour activer le forçage), 1: Symétrique, 2: Antisymétrique
+    mode = 2
+    
+    if mode == 0:
+        theta1, theta2 = 0.0, 0.0
+    elif mode == 1:
+        theta1, theta2 = 0.3, 0.3
+    elif mode == 2:
+        theta1, theta2 = 0.2, -0.2
     
     piv1 = Particule(p0=V3D(X_pivot1, Y_pivot), fix=True, color='black', name="Piv1")
     piv2 = Particule(p0=V3D(X_pivot2, Y_pivot), fix=True, color='black', name="Piv2")
