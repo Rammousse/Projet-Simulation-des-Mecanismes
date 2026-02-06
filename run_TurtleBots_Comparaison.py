@@ -8,9 +8,9 @@ from run_TurtleBots_Wheels import TurtleBotDifferential
 from run_TurtleBots_Motors import TurtleBotMotorise
 
 
-PID_KP = 20.0   
+PID_KP = 100.0   
 PID_KI = 60.0  
-PID_KD = 0.5   
+PID_KD = 20.0   
 
 KP_GUIDAGE = 2.0  
 V_MAX = 1.0       
