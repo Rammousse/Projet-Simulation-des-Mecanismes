@@ -48,7 +48,7 @@ def demo_pendules_couples():
     
     # Choix du mode pour la démonstration :
     # 0: Repos (pour activer le forçage), 1: Symétrique, 2: Antisymétrique
-    mode = 2
+    mode = 0
     
     if mode == 0:
         theta1, theta2 = 0.0, 0.0
