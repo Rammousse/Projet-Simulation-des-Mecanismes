@@ -157,6 +157,92 @@ def courbe_regime_permanent(k, l0, m_part):
     show()
 
 
+def courbe_regime_permanent_multi_k(liste_k, l0, m_part):
+    """
+    Trace les courbes d'équilibre pour plusieurs valeurs de k sur le même graphe.
+    Adapte l'échelle des abscisses automatiquement.
+    """
+    
+    figure("Comparaison des raideurs k")
+    
+    # Couleurs pour distinguer les courbes
+    couleurs = ['b', 'g', 'r', 'c', 'm']
+    
+    # Limite physique approximative du moteur
+    w_max_moteur = 22.0 
+    
+    for i, k in enumerate(liste_k):
+        col = couleurs[i % len(couleurs)]
+        
+        # Calcul de la borne de simulation
+        # On veut aller jusqu'à l'asymptote théorique : sqrt(k/m)
+        w_critique = sqrt(k / m_part)
+
+        print(f"Simulation pour k = {k} N/m")
+        print(f"   w_critique = {w_critique} rad/s")
+        
+        # On s'arrête un peu avant l'explosion (95%) ou à la limite du moteur
+        w_max_simu = min(w_critique * 0.90, w_max_moteur)
+        
+        # Génération des points de mesure (15 points répartis)
+        vitesses_cibles = linspace(0.1, w_max_simu, 12)
+        
+        distances_eq = []
+        omegas_eq = []
+        
+        step_simu = 0.005
+        
+        # Simulation pour chaque point de vitesse
+        for v_target in vitesses_cibles:
+            univ_simu = Univers(step=step_simu, game=False)
+            
+            # Configuration identique à l'exercice
+            motor_tmp = MoteurCC(J=0.1, f=0.01, name="SimuTurbo") 
+            pid_tmp = ControlPID_vitesse(motor_tmp, Kp=20.0, Ki=60.0)
+            pid_tmp.setTarget(v_target)
+            
+            centre_tmp = Particule(p0=V3D(0,0,0), fix=True)
+            part_tmp = Particule(mass=m_part, p0=V3D(l0, 0, 0), v0=V3D(0,0,0))
+            
+            ressort_tmp = SpringDamper(centre_tmp, part_tmp, k=k, c=5.0, l0=l0)
+            liaison_tmp = LiaisonMoteurPhysique(motor_tmp, pid_tmp, part_tmp, step=step_simu, pivot=centre_tmp)
+            
+            univ_simu.addParticule(part_tmp)
+            univ_simu.addGenerators(ressort_tmp, liaison_tmp)
+            
+            # On laisse le temps au système de se stabiliser
+            univ_simu.simulateFor(10.0)
+            
+            d_final = part_tmp.getPosition().mod()
+            w_final = motor_tmp.getSpeed()
+            
+            distances_eq.append(d_final)
+            omegas_eq.append(w_final)
+        
+        plot(omegas_eq, distances_eq, 'o-', color=col, label=f'Simu k={k}')
+        
+        # d = k*l0 / (k - m*w^2)
+        w_th = linspace(0, w_critique * 0.99, 100)
+        # Filtrer pour ne pas dépasser la limite moteur sur le graph théorique aussi
+        w_th = w_th[w_th < w_max_moteur]
+        
+        d_th = (k * l0) / (k - m_part * w_th**2)
+        plot(w_th, d_th, '--', color=col, alpha=0.6, linewidth=1) # alpha pour transparence
+        
+        # Tracer une ligne verticale pour l'asymptote théorique
+        if w_critique < w_max_moteur:
+            axvline(x=w_critique, color=col, linestyle=':', alpha=0.5)
+
+    title(f"Distance d'équilibre vs Vitesse rotation (m={m_part}kg)")
+    xlabel("Vitesse de rotation (rad/s)")
+    ylabel("Distance à l'axe (m)")
+    grid(True)
+    legend()
+    # Limiter l'axe Y pour éviter d'écraser le graphe si une valeur part à l'infini
+    ylim(0, l0 * 10) 
+    show()
+
+
 if __name__ == '__main__':
     
     k = 30.0
@@ -164,6 +250,7 @@ if __name__ == '__main__':
     m_part = 1.0
     step = 0.005
     
+    courbe_regime_permanent_multi_k([5.0, 30.0, 60, 100], l0, m_part)
     courbe_regime_permanent(k, l0, m_part)
     
     W_win, H_win = 1024, 780
