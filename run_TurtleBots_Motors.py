@@ -25,8 +25,8 @@ class TurtleBotMotorise(TurtleBot):
         self.motorR = MoteurCC(name="MotDroit",  **params_moteur)
         
         # PID pour chaque moteur pour maintenir la vitesse de consigne
-        self.pidL = ControlPID_vitesse(self.motorL, Kp=5.0, Ki=20.0, Kd=0.0)
-        self.pidR = ControlPID_vitesse(self.motorR, Kp=5.0, Ki=20.0, Kd=0.0)
+        self.pidL = ControlPID_vitesse(self.motorL, Kp=100.0, Ki=60.0, Kd=20.0)
+        self.pidR = ControlPID_vitesse(self.motorR, Kp=100.0, Ki=60.0, Kd=20.0)
         
         # consignes de vitesse de rotation des roues (rad/s)
         self.target_wL = 0.0
