@@ -545,7 +545,7 @@ class LiaisonMotorisee(Force):
         
         # Calcul de la tension totale avec saturation (limites de l'alimentation)
         self.voltage = pid_voltage + u_gravity
-        self.voltage = max(-12.0, min(12.0, self.voltage))
+        self.voltage = max(-24.0, min(24.0, self.voltage))
         
         # Modèle électrique du moteur (U = E + RI)
         E = self.motor.ke * relative_omega
