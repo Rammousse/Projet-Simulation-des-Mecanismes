@@ -107,7 +107,7 @@ def keyboard_control_wheels(self, events, keys):
 if __name__ == '__main__':
     
     monde = Univers(name="Arène TurtleBot", dimensions=(5,5), gameDimensions=(1024,780), fps=60)
-    robot = TurtleBotDifferential(P0=V3D(2.5, 2.5), radius=0.05, wheelbase=0.3, name="Wall-E", color="orange")
+    robot = TurtleBotDifferential(P0=V3D(2.5, 2.5), radius=0.05, wheelbase=0.3, name="vroum vroum")
     
     monde.addParticule(robot)
     monde.gameInteraction = MethodType(keyboard_control_wheels, monde)
