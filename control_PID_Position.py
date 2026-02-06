@@ -161,25 +161,25 @@ if __name__ == '__main__':
             etat = "SATURATION"
         print(f"[{label:20s}] Kp={pid.Kp:5.1f}, Kd={pid.Kd:4.1f} : {etat:10s} (Max: {v_max:.2f} V)")
 
-    print("\n--- GROUPE 1 : Influence Kp ---")
+    print("\n--- Influence Kp ---")
     check_saturation(pid_kp1, "P Tres Faible")
     check_saturation(pid_kp2, "P Moyen")
     check_saturation(pid_kp3, "P Rapide")
     check_saturation(pid_kp4, "P Fort")
     check_saturation(pid_kp5, "P Tres Fort")
     
-    print("\n--- GROUPE 2 : Influence Kd (avec Kp=200) ---")
+    print("\n--- Influence Kd (avec Kp=100) ---")
     check_saturation(pid_kd1, "Sans Derive")
     check_saturation(pid_kd2, "D Faible")
     check_saturation(pid_kd3, "D Moyen")
-    check_saturation(pid_kd4, "D Optimal")
+    check_saturation(pid_kd4, "D Fort")
     check_saturation(pid_kd5, "D Trop Fort")
 
-    print("\n--- GROUPE 3 : configurations Idéales---")
+    print("\n--- configurations Idéales ---")
     check_saturation(pid_kd1, "Sans Derive")
     check_saturation(pid_kd2, "D Faible")
     check_saturation(pid_kd3, "D Moyen")
-    check_saturation(pid_kd4, "D Optimal")
+    check_saturation(pid_kd4, "D Fort")
     check_saturation(pid_kd5, "D Trop Fort")
     
     # GRAPHIQUES
