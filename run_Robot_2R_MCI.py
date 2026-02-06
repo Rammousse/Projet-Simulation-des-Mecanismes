@@ -83,10 +83,10 @@ def demo_robot_2R_MCI():
     monde.addGenerators(Gravity(V3D(0, -9.81)), liaison_eca1, liaison_eca2, joint1, joint2)
     
     # Position cible active
-    target_cartesian = MGD(init_q1, init_q2, L1, L2, pivot_pos)
+    monde.target_cartesian = MGD(init_q1, init_q2, L1, L2, pivot_pos)
     
-    # Position de départ du mouvement (pour calculer l'écart à la ligne)
-    start_cartesian = V3D(target_cartesian.x, target_cartesian.y)
+    # Position de départ du mouvement
+    monde.start_cartesian = V3D(monde.target_cartesian.x, monde.target_cartesian.y)
     
     V_max = 6.0           
     dist_threshold = 0.001
@@ -94,7 +94,6 @@ def demo_robot_2R_MCI():
     history = {'t': [], 'dist_err': [], 'lateral_err': [], 'q1': [], 'q2': []}
     
     def control_MCI(self_univ, events, keys):
-        nonlocal target_cartesian, start_cartesian
         
         # gestion de la Souris
         for event in events:
@@ -107,31 +106,33 @@ def demo_robot_2R_MCI():
                 # On utilise la position actuelle de l'effecteur comme départ
                 curr_q1 = bras1.theta
                 curr_q2 = bras2.theta - bras1.theta
-                start_cartesian = MGD(curr_q1, curr_q2, L1, L2, pivot_pos)
                 
-                target_cartesian = V3D(real_x, real_y)
-                cible_visuelle.position[-1] = target_cartesian
-                print(f"Cible : {target_cartesian}")
+                self_univ.start_cartesian = MGD(curr_q1, curr_q2, L1, L2, pivot_pos)
+                
+                # MODIFICATION 2 : On met à jour self_univ.target_cartesian
+                self_univ.target_cartesian = V3D(real_x, real_y)
+                cible_visuelle.position[-1] = self_univ.target_cartesian
+                print(f"Cible : {self_univ.target_cartesian}")
         
-        # récupération de l'etat actel
+        # récupération de l'etat actuel
         current_q1 = bras1.theta
         current_q2 = bras2.theta - bras1.theta
         current_effector_pos = MGD(current_q1, current_q2, L1, L2, pivot_pos)
         
-        # erreur de distance
-        diff_vec = target_cartesian - current_effector_pos
+        # erreur de distance (Utilisation de self_univ.)
+        diff_vec = self_univ.target_cartesian - current_effector_pos
         dist_error = diff_vec.mod()
         
-        # erreur latérale Ecart à la ligne
-        vec_traj_x = target_cartesian.x - start_cartesian.x
-        vec_traj_y = target_cartesian.y - start_cartesian.y
+        # erreur latérale Ecart à la ligne (Utilisation de self_univ.)
+        vec_traj_x = self_univ.target_cartesian.x - self_univ.start_cartesian.x
+        vec_traj_y = self_univ.target_cartesian.y - self_univ.start_cartesian.y
         len_traj = sqrt(vec_traj_x**2 + vec_traj_y**2)
         
         lateral_error = 0.0
         if len_traj > 0.0001:
             # Vecteur AP (Départ -> Position Actuelle)
-            vec_curr_x = current_effector_pos.x - start_cartesian.x
-            vec_curr_y = current_effector_pos.y - start_cartesian.y
+            vec_curr_x = current_effector_pos.x - self_univ.start_cartesian.x
+            vec_curr_y = current_effector_pos.y - self_univ.start_cartesian.y
             
             # Produit vectoriel pour la distance perpendiculaire
             cross_prod = vec_traj_x * vec_curr_y - vec_traj_y * vec_curr_x
@@ -142,10 +143,7 @@ def demo_robot_2R_MCI():
         
         if dist_error > dist_threshold:
             direction = diff_vec.norm()
-            
-            # vitesse max comme constante
             current_speed = V_max
-            
             v_cmd = direction * current_speed
             dX[0, 0] = v_cmd.x
             dX[1, 0] = v_cmd.y
